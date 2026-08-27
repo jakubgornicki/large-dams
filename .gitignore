@@ -1,0 +1,16 @@
+.DS_Store
+.claude/
+.codex/
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+*.log
+
+# Downloaded source data used only when rebuilding the published dataset.
+build/GDW_barriers_v1_0.txt
+
+# Generated distribution archive; GitHub Pages deploys directly from web/.
+web/dams-map.zip

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Methodology - Past the Expiration Date</title>
+<meta name="description" content="Sources, calculations and limitations behind the interactive map of Europe's ageing large dams." />
+<style>
+  :root {
+    --bg: #0f1113;
+    --panel: #16191c;
+    --panel-2: #1b1f23;
+    --ink: #f2f4f5;
+    --muted: #898781;
+    --secondary: #c3c2b7;
+    --line: #2c2c2a;
+    --accent: #e5352b;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 75% 5%, rgba(229, 53, 43, .11), transparent 28rem),
+      var(--bg);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  [hidden] { display: none !important; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid rgba(44, 44, 42, .82);
+    background: rgba(15, 17, 19, .9);
+    backdrop-filter: blur(12px);
+  }
+  .topbar-inner {
+    width: min(1120px, calc(100% - 40px));
+    min-height: 62px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--secondary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .project-link::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+  .back-link {
+    color: var(--secondary);
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .back-link:hover { color: #fff; }
+  .lang-toggle {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+  .lang-toggle button {
+    border: 0;
+    border-radius: 5px;
+    padding: 6px 10px;
+    color: var(--muted);
+    background: transparent;
+    font: 700 12px/1 var(--sans);
+    cursor: pointer;
+  }
+  .lang-toggle button.active { color: #fff; background: var(--accent); }
+  .lang-toggle button:focus-visible,
+  a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+  main {
+    width: min(1120px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 92px 0 80px;
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(250px, .7fr);
+    gap: clamp(40px, 8vw, 110px);
+    align-items: end;
+    padding-bottom: 68px;
+  }
+  h1 {
+    max-width: 10ch;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(48px, 8vw, 92px);
+    font-weight: 700;
+    letter-spacing: -.035em;
+    line-height: .98;
+  }
+  .hero-copy {
+    max-width: 35rem;
+    margin: 28px 0 0;
+    color: var(--secondary);
+    font-size: clamp(18px, 2vw, 22px);
+    line-height: 1.5;
+  }
+  .updated {
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .headline-stat {
+    border-left: 2px solid var(--accent);
+    padding: 6px 0 8px 24px;
+  }
+  .headline-stat strong {
+    display: block;
+    font-size: clamp(58px, 8vw, 88px);
+    letter-spacing: -.055em;
+    line-height: .9;
+  }
+  .headline-stat span {
+    display: block;
+    max-width: 19rem;
+    margin-top: 14px;
+    color: var(--secondary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0 0 72px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .contents a {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .contents a:hover { color: var(--ink); }
+
+  .section {
+    display: grid;
+    grid-template-columns: minmax(180px, 280px) minmax(0, 680px);
+    justify-content: space-between;
+    gap: 48px;
+    padding: 70px 0;
+    border-top: 1px solid var(--line);
+  }
+  .section:first-of-type { border-top: 0; }
+  .section h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 40px);
+    letter-spacing: -.02em;
+    line-height: 1.15;
+  }
+  .section-body > :first-child { margin-top: 0; }
+  .section-body p {
+    margin: 0 0 20px;
+    color: var(--secondary);
+    font-size: 16px;
+  }
+  .section-body h3 {
+    margin: 34px 0 10px;
+    color: var(--ink);
+    font-size: 15px;
+  }
+
+  .source-list { border-top: 1px solid var(--line); }
+  .source {
+    display: grid;
+    grid-template-columns: minmax(150px, .75fr) minmax(0, 1.25fr);
+    gap: 30px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .source strong { font-size: 15px; }
+  .source p { margin: 0; font-size: 14px; }
+  .source a { text-decoration-color: var(--muted); text-underline-offset: 3px; }
+  .source a:hover { color: #fff; }
+
+  .funnel {
+    margin: 34px 0;
+    border-top: 1px solid var(--line);
+  }
+  .funnel-row {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 24px;
+    align-items: baseline;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .funnel-row strong {
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .funnel-row:last-child strong { color: #f0645a; }
+  .funnel-row span { color: var(--secondary); font-size: 14px; }
+
+  .formula {
+    margin: 30px 0;
+    padding: 24px;
+    border: 1px solid rgba(229, 53, 43, .35);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    background: rgba(229, 53, 43, .08);
+  }
+  .formula strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 21px;
+  }
+  .formula span { color: var(--secondary); font-size: 14px; }
+
+  .definitions {
+    margin: 28px 0 0;
+    border-top: 1px solid var(--line);
+  }
+  .definition {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .definition code {
+    color: #f2a59d;
+    font: 700 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .definition span { color: var(--secondary); font-size: 14px; }
+
+  .limits {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: limits;
+  }
+  .limits li {
+    position: relative;
+    padding: 0 0 30px 52px;
+    color: var(--secondary);
+    counter-increment: limits;
+  }
+  .limits li::before {
+    content: counter(limits, decimal-leading-zero);
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+  }
+  .limits strong { color: var(--ink); }
+
+  .legal-note {
+    padding: 30px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+  .legal-note p:last-child { margin-bottom: 0; }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    align-items: flex-end;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .footer-back {
+    display: inline-block;
+    padding: 11px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--secondary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .footer-back:hover { border-color: var(--muted); color: #fff; }
+
+  @media (max-width: 760px) {
+    .topbar-inner, main { width: min(100% - 28px, 1120px); }
+    .project-link { max-width: 15ch; line-height: 1.3; }
+    .back-link { display: none; }
+    main { padding-top: 58px; }
+    .hero { grid-template-columns: 1fr; gap: 44px; padding-bottom: 52px; }
+    h1 { max-width: 100%; font-size: clamp(44px, 14vw, 64px); }
+    .headline-stat { max-width: 25rem; }
+    .contents { margin-bottom: 34px; }
+    .section { grid-template-columns: 1fr; gap: 28px; padding: 48px 0; }
+    .source { grid-template-columns: 1fr; gap: 8px; }
+    .funnel-row { grid-template-columns: 82px minmax(0, 1fr); gap: 16px; }
+    .definition { grid-template-columns: 1fr; gap: 4px; }
+    .legal-note { padding: 22px; }
+    footer { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="project-link map-link" href="index.html">Past the Expiration Date</a>
+      <div class="nav-actions">
+        <a class="back-link map-link" href="index.html" data-copy="back">Back to the map</a>
+        <div class="lang-toggle" id="language" aria-label="Language">
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="pl">PL</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <article data-language="en">
+      <header class="hero">
+        <div>
+          <h1>Methodology</h1>
+          <p class="hero-copy">This page explains where the map data comes from, how the headline number was calculated, and what the available records cannot show.</p>
+          <p class="updated">Updated 17 July 2026</p>
+        </div>
+        <div class="headline-stat">
+          <strong>884</strong>
+          <span>European large dams in the map meet all three headline criteria: a recorded construction year, a recorded reservoir capacity of at least 10 million m³, and an age of at least 50 years.</span>
+        </div>
+      </header>
+
+      <nav class="contents" aria-label="On this page">
+        <a href="#en-sources">Sources</a>
+        <a href="#en-headline">The 884 figure</a>
+        <a href="#en-fields">Calculations</a>
+        <a href="#en-countries">Country figures</a>
+        <a href="#en-limits">Limitations</a>
+      </nav>
+
+      <section class="section" id="en-sources">
+        <h2>Data behind the map</h2>
+        <div class="section-body">
+          <p>The map combines four sources of evidence. Each source serves a different purpose. The figures do not provide a complete inventory of all dams and river barriers in Europe.</p>
+          <div class="source-list">
+            <div class="source">
+              <strong><a href="https://figshare.com/articles/dataset/Global_Dam_Watch_database_version_1_0/25988293" target="_blank" rel="noopener">Global Dam Watch v1.0</a></strong>
+              <p>Provides the mapped locations and key attributes of large dams, including construction year, height, reservoir capacity and main use. The source contains 41,145 barriers worldwide, including 4,321 records in Europe used by this map.</p>
+            </div>
+            <div class="source">
+              <strong>ICOLD figures cited in the ClientEarth report</strong>
+              <p>Provide the headline totals shown for Poland, Italy, Bulgaria and Romania. These national figures are used because Global Dam Watch does not contain every structure listed in the report.</p>
+            </div>
+            <div class="source">
+              <strong><a href="https://amber.international/european-barrier-atlas/" target="_blank" rel="noopener">AMBER Barrier Atlas</a></strong>
+              <p>Provides Europe-wide context on river fragmentation and barrier density. It is not used to calculate dam age or the headline number of large dams.</p>
+            </div>
+            <div class="source">
+              <strong><a href="https://www.unwater.org/news/unu-inweh-report-ageing-water-storage-infrastructure" target="_blank" rel="noopener">UNU-INWEH</a></strong>
+              <p>Provides the 50-year alert age used to frame the risks associated with ageing large water-storage infrastructure.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="en-headline">
+        <h2>How the number 884 was calculated</h2>
+        <div class="section-body">
+          <p>The headline figure is not a count of every old dam in Europe. It is a deliberately narrower group selected from the Global Dam Watch records used in this map.</p>
+          <div class="funnel" aria-label="Data selection steps">
+            <div class="funnel-row"><strong>4,321</strong><span>European dam records in the map</span></div>
+            <div class="funnel-row"><strong>1,514</strong><span>records with a documented construction year</span></div>
+            <div class="funnel-row"><strong>1,288</strong><span>records with a documented construction year and a reservoir capacity of at least 10 million m³</span></div>
+            <div class="funnel-row"><strong>884</strong><span>records that had also reached the 50-year alert age by 2026</span></div>
+          </div>
+          <div class="formula">
+            <strong>Recorded year + capacity ≥ 10 million m³ + age ≥ 50 = 884</strong>
+            <span>Without the capacity filter, 907 dated European dams in the dataset are at least 50 years old.</span>
+          </div>
+          <p>The selected group serves as a data proxy for the report's legal argument. It should not be interpreted as a finding that every individual dam required an Environmental Impact Assessment.</p>
+        </div>
+      </section>
+
+      <section class="section" id="en-fields">
+        <h2>How the fields are read</h2>
+        <div class="section-body">
+          <p>The map uses 2026, the report's publication year, as its common reference point.</p>
+          <div class="definitions">
+            <div class="definition">
+              <code>age</code>
+              <span>2026 minus the recorded construction year. No age is assigned where a year is missing.</span>
+            </div>
+            <div class="definition">
+              <code>capacity ≥ 10</code>
+              <span>A recorded reservoir capacity of at least 10 million m³. Missing capacity is not counted as meeting this filter.</span>
+            </div>
+            <div class="definition">
+              <code>age groups</code>
+              <span>Under 25, 25-49, 50-74, 75 or more, and unknown.</span>
+            </div>
+            <div class="definition">
+              <code>alert age</code>
+              <span>50 years, following the framing used by UNU-INWEH for ageing large dams.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="en-countries">
+        <h2>Why the country figures differ from the dots</h2>
+        <div class="section-body">
+          <p>The country cards quote figures from the ClientEarth report, based on the ICOLD World Register. The map dots come from Global Dam Watch. The two sources have different coverage.</p>
+          <p>For dams above the map's capacity threshold, Global Dam Watch is close to the report for Poland (47 records compared with 46) and Romania (104 compared with more than 100). It contains fewer matching records for Italy (112 compared with 184) and Bulgaria (53 compared with 76).</p>
+          <p>For that reason, the country cards preserve the report's figures, while Global Dam Watch is used for the locations that can be shown on the map. A card total and the number of visible dots should not be expected to match exactly.</p>
+        </div>
+      </section>
+
+      <section class="section" id="en-limits">
+        <h2>Limitations and legal context</h2>
+        <div class="section-body">
+          <ol class="limits">
+            <li><strong>Construction year is the largest data gap.</strong> It is recorded for about 35% of the European dams in Global Dam Watch. Reservoir capacity coverage is higher, at about 66%. All age-based figures therefore reflect only dams with a recorded construction year, rather than a complete inventory of European dams.</li>
+            <li><strong>Unknown does not mean new.</strong> Dams without a recorded construction year remain visible in grey and are excluded from age calculations.</li>
+            <li><strong>AMBER is a fragmentation dataset.</strong> It supports the wider picture of barriers across European rivers, but it is not used as a census of large dams.</li>
+            <li><strong>Individual records may be wrong or outdated.</strong> Locations and attributes can contain omissions, inconsistencies or errors inherited from the source datasets.</li>
+          </ol>
+          <div class="legal-note">
+            <p><strong>What the map does not determine</strong></p>
+            <p>The 10 million m³ threshold is a map filter chosen with reference to a category in Annex I of the EU Environmental Impact Assessment Directive. Capacity alone does not establish the legal status of an individual dam.</p>
+            <p>In the four countries examined in the report, allowing an existing dam to continue operating did not generally trigger a new environmental assessment or public participation in the permitting process automatically. The map illustrates the scale and age of the infrastructure; it does not provide a legal assessment of individual permits.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>Sources: Global Dam Watch v1.0, figures cited in the ClientEarth report, AMBER Barrier Atlas and UNU-INWEH.</span>
+        <a class="footer-back map-link" href="index.html">Back to the map</a>
+      </footer>
+    </article>
+
+    <article data-language="pl" hidden>
+      <header class="hero">
+        <div>
+          <h1>Metodologia</h1>
+          <p class="hero-copy">Ta strona wyjaśnia, skąd pochodzą dane na mapie, jak obliczono główną liczbę oraz czego nie da się ustalić na podstawie dostępnych rekordów.</p>
+          <p class="updated">Aktualizacja: 17 lipca 2026 r.</p>
+        </div>
+        <div class="headline-stat">
+          <strong>884</strong>
+          <span>europejskie duże zapory spełniają wszystkie trzy kryteria: zapisany rok budowy, zapisana pojemność co najmniej 10 mln m³ oraz wiek co najmniej 50 lat.</span>
+        </div>
+      </header>
+
+      <nav class="contents" aria-label="Na tej stronie">
+        <a href="#pl-sources">Źródła</a>
+        <a href="#pl-headline">Liczba 884</a>
+        <a href="#pl-fields">Obliczenia</a>
+        <a href="#pl-countries">Dane krajowe</a>
+        <a href="#pl-limits">Ograniczenia</a>
+      </nav>
+
+      <section class="section" id="pl-sources">
+        <h2>Dane wykorzystane na mapie</h2>
+        <div class="section-body">
+          <p>Mapa łączy trzy rodzaje danych. Każde źródło pełni inną funkcję, dlatego przedstawionych liczb nie należy traktować jako jednego, kompletnego rejestru wszystkich zapór i barier rzecznych w Europie.</p>
+          <div class="source-list">
+            <div class="source">
+              <strong><a href="https://figshare.com/articles/dataset/Global_Dam_Watch_database_version_1_0/25988293" target="_blank" rel="noopener">Global Dam Watch v1.0</a></strong>
+              <p>Jest źródłem lokalizacji i zapisanych cech dużych zapór, takich jak rok budowy, wysokość, pojemność zbiornika i główne przeznaczenie. Baza zawiera 41 145 barier na świecie, w tym 4321 rekordów z Europy wykorzystanych na mapie.</p>
+            </div>
+            <div class="source">
+              <strong>Dane ICOLD cytowane w raporcie ClientEarth</strong>
+              <p>Są źródłem głównych liczb pokazanych dla Polski, Włoch, Bułgarii i Rumunii. Dane krajowe pochodzą z raportu, ponieważ Global Dam Watch nie obejmuje wszystkich obiektów w nim wymienionych.</p>
+            </div>
+            <div class="source">
+              <strong><a href="https://amber.international/european-barrier-atlas/" target="_blank" rel="noopener">AMBER Barrier Atlas</a></strong>
+              <p>Dostarcza europejskiego kontekstu dotyczącego fragmentacji rzek i gęstości barier. Nie służy do obliczania wieku zapór ani głównej liczby dużych zapór.</p>
+            </div>
+            <div class="source">
+              <strong><a href="https://www.unwater.org/news/unu-inweh-report-ageing-water-storage-infrastructure" target="_blank" rel="noopener">UNU-INWEH</a></strong>
+              <p>Jest źródłem 50-letniego wieku alarmowego użytego do przedstawienia ryzyka związanego ze starzeniem się dużej infrastruktury wodnej.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pl-headline">
+        <h2>Jak obliczono 884</h2>
+        <div class="section-body">
+          <p>Główna liczba nie obejmuje wszystkich starych zapór w Europie. To celowo zawężona grupa wybrana z rekordów Global Dam Watch wykorzystanych na mapie.</p>
+          <div class="funnel" aria-label="Etapy wyboru danych">
+            <div class="funnel-row"><strong>4321</strong><span>europejskich rekordów zapór na mapie</span></div>
+            <div class="funnel-row"><strong>1514</strong><span>rekordów z zapisanym rokiem budowy</span></div>
+            <div class="funnel-row"><strong>1288</strong><span>rekordów z rokiem budowy i pojemnością co najmniej 10 mln m³</span></div>
+            <div class="funnel-row"><strong>884</strong><span>rekordy, które w 2026 r. miały również co najmniej 50 lat</span></div>
+          </div>
+          <div class="formula">
+            <strong>Zapisany rok + pojemność ≥ 10 mln m³ + wiek ≥ 50 lat = 884</strong>
+            <span>Bez filtra pojemności co najmniej 50 lat ma 907 europejskich zapór z zapisanym rokiem budowy.</span>
+          </div>
+          <p>Wybrana grupa jest przybliżeniem opartym na dostępnych danych, które wspiera argument przedstawiony w raporcie. Nie oznacza to, że dla każdej z tych zapór stwierdzono prawny obowiązek przeprowadzenia oceny oddziaływania na środowisko.</p>
+        </div>
+      </section>
+
+      <section class="section" id="pl-fields">
+        <h2>Jak odczytywane są dane</h2>
+        <div class="section-body">
+          <p>Wspólnym punktem odniesienia jest rok 2026, czyli rok publikacji raportu.</p>
+          <div class="definitions">
+            <div class="definition">
+              <code>wiek</code>
+              <span>Różnica między rokiem 2026 a zapisanym rokiem budowy. Jeśli w bazie nie ma roku budowy, wiek nie jest obliczany.</span>
+            </div>
+            <div class="definition">
+              <code>pojemność ≥ 10</code>
+              <span>Zapisana pojemność zbiornika wynosząca co najmniej 10 mln m³. Brak danych o pojemności nie jest liczony jako spełnienie tego kryterium.</span>
+            </div>
+            <div class="definition">
+              <code>grupy wieku</code>
+              <span>Poniżej 25 lat, 25-49, 50-74, co najmniej 75 lat oraz brak danych.</span>
+            </div>
+            <div class="definition">
+              <code>wiek alarmowy</code>
+              <span>50 lat, zgodnie z ujęciem stosowanym przez UNU-INWEH wobec starzejących się dużych zapór.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pl-countries">
+        <h2>Dlaczego dane krajowe różnią się od liczby punktów</h2>
+        <div class="section-body">
+          <p>Karty krajów pokazują dane z raportu ClientEarth, oparte na Światowym Rejestrze ICOLD. Punkty na mapie pochodzą z Global Dam Watch. Oba źródła mają inny zakres.</p>
+          <p>Dla zapór przekraczających próg pojemności użyty na mapie Global Dam Watch jest zbliżony do raportu w przypadku Polski (47 rekordów wobec 46) i Rumunii (104 wobec ponad 100). Baza zawiera mniej pasujących rekordów dla Włoch (112 wobec 184) i Bułgarii (53 wobec 76).</p>
+          <p>Dlatego karty krajów zachowują liczby podane w raporcie, a Global Dam Watch służy do pokazania lokalizacji na mapie. Liczba na karcie i liczba widocznych punktów nie muszą być identyczne.</p>
+        </div>
+      </section>
+
+      <section class="section" id="pl-limits">
+        <h2>Ograniczenia i kontekst prawny</h2>
+        <div class="section-body">
+          <ol class="limits">
+            <li><strong>Największą luką jest rok budowy.</strong> Zapisano go dla około 35% europejskich zapór w Global Dam Watch. Dane o pojemności są pełniejsze i obejmują około 66% rekordów. Każda liczba oparta na wieku dotyczy więc wyłącznie zapór z datą, a nie pełnego rejestru.</li>
+            <li><strong>Brak danych nie oznacza, że zapora jest nowa.</strong> Obiekty bez zapisanego roku budowy pozostają na mapie jako szare punkty i nie są uwzględniane w obliczeniach wieku.</li>
+            <li><strong>AMBER jest bazą fragmentacji rzek.</strong> Pokazuje szerszą skalę barier w europejskich rzekach, ale nie służy jako rejestr dużych zapór.</li>
+            <li><strong>Poszczególne rekordy mogą być nieaktualne lub błędne.</strong> Lokalizacje i cechy obiektów mogą zawierać braki, niespójności lub błędy pochodzące ze źródłowych baz danych.</li>
+          </ol>
+          <div class="legal-note">
+            <p><strong>Czego mapa nie rozstrzyga</strong></p>
+            <p>Próg 10 mln m³ jest filtrem mapy, wybranym w odniesieniu do jednej z kategorii wymienionych w załączniku I do unijnej dyrektywy OOŚ. Sama pojemność nie przesądza o statusie prawnym konkretnej zapory.</p>
+            <p>W czterech państwach przeanalizowanych w raporcie zgoda na dalszą eksploatację istniejącej zapory co do zasady nie uruchamiała automatycznie nowej oceny oddziaływania na środowisko ani udziału społeczeństwa w postępowaniu. Mapa pokazuje skalę i wiek infrastruktury, ale nie jest oceną prawną poszczególnych pozwoleń.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>Źródła: Global Dam Watch v1.0, dane cytowane w raporcie ClientEarth, AMBER Barrier Atlas i UNU-INWEH.</span>
+        <a class="footer-back map-link" href="index.html">Wróć do mapy</a>
+      </footer>
+    </article>
+  </main>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let language = params.get("lang") === "pl" ? "pl" : "en";
+
+  function applyLanguage(nextLanguage, updateUrl = true) {
+    language = nextLanguage;
+    document.documentElement.lang = language;
+    document.title = language === "pl"
+      ? "Metodologia - Zapory po terminie"
+      : "Methodology - Past the Expiration Date";
+
+    document.querySelectorAll("[data-language]").forEach((article) => {
+      article.hidden = article.dataset.language !== language;
+    });
+    document.querySelectorAll("#language button").forEach((button) => {
+      const active = button.dataset.lang === language;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    document.querySelectorAll(".map-link").forEach((link) => {
+      link.href = `index.html?lang=${language}`;
+    });
+
+    const back = document.querySelector("[data-copy='back']");
+    back.textContent = language === "pl" ? "Wróć do mapy" : "Back to the map";
+
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", language);
+      window.history.replaceState({}, "", url);
+    }
+  }
+
+  document.getElementById("language").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-lang]");
+    if (button) applyLanguage(button.dataset.lang);
+  });
+
+  applyLanguage(language, false);
+</script>
+</body>
+</html>
