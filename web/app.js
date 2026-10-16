@@ -8,6 +8,7 @@ const REF_YEAR = 2026, ALERT = 50;
 const BRIEF_URL = '#'; // Set this to the public briefing URL when customizing a fork.
 
 let lang = (new URLSearchParams(location.search).get('lang') === 'pl') ? 'pl' : 'en';
+const isEmbed = new URLSearchParams(location.search).get('embed') === '1';
 let stats = null, damFeatures = null, countedOnce = false;
 
 /* ---------------- i18n ---------------- */
@@ -27,6 +28,17 @@ function applyI18n() {
     el.href = `methodology.html?lang=${lang}`;
   });
   document.getElementById('link-brief').href = BRIEF_URL;
+  if (isEmbed) {
+    const storyUrl = new URL(location.href);
+    storyUrl.searchParams.delete('embed');
+    storyUrl.searchParams.set('lang', lang);
+    document.getElementById('embed-story').href = storyUrl.href;
+    document.getElementById('embed-mode').setAttribute('aria-label', t('embed_colours'));
+    document.querySelectorAll('[data-methodology-link]').forEach(el => {
+      el.target = '_blank';
+      el.rel = 'noopener';
+    });
+  }
   buildCountryCards();
   buildTiles();
   renderDecadeChart();
@@ -36,10 +48,21 @@ function applyI18n() {
 const map = new maplibregl.Map({
   container: 'map',
   style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-  center: [12, 50], zoom: 3.4, minZoom: 2.5, maxZoom: 12,
+  center: [12, 50], zoom: 3.4, minZoom: isEmbed ? 0 : 2.5, maxZoom: 12,
   attributionControl: false, preserveDrawingBuffer: true,
 });
 map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+if (isEmbed) {
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+  // Preserve scrolling of the article containing the iframe.
+  map.scrollZoom.disable();
+  document.getElementById('embed-mode').addEventListener('change', e => paint(e.target.value));
+  document.getElementById('embed-reset').addEventListener('click', fitEmbed);
+}
+
+function fitEmbed() {
+  map.fitBounds([[-12, 34], [35, 71]], { padding: { top: 110, bottom: 35, left: 25, right: 45 }, duration: 0 });
+}
 
 function ageBucket(age) {
   if (age == null) return 'unknown';
@@ -185,10 +208,10 @@ Promise.all([
   applyI18n(); // needs stats
 
   // Headline counter is decoupled from the map so it always runs (hero is first in view).
-  if (!countedOnce) { countedOnce = true; animateCounter(stats.past_alert_over10); }
+  if (!isEmbed && !countedOnce) { countedOnce = true; animateCounter(stats.past_alert_over10); }
 
-  map.on('load', () => {
-    map.addSource('dams', { type: 'geojson', data: fc });
+  const initializeMap = () => {
+    map.addSource('dams', { type: 'geojson', data: fc, attribution: 'Dams: Global Dam Watch v1.0' });
     map.addLayer({ id: 'dams', type: 'circle', source: 'dams', paint: {
       'circle-color': colorExpr.age,
       'circle-radius': ['interpolate', ['linear'], ['zoom'],
@@ -198,8 +221,15 @@ Promise.all([
       'circle-stroke-width': 0.4, 'circle-stroke-color': 'rgba(0,0,0,.5)', 'circle-opacity': 0.92,
     }});
     renderLegend('age');
-    setupScroll();
-    setState('hero', null); // guarantee initial map state (scrollama may not emit enter for a step already in view)
+    if (isEmbed) {
+      document.getElementById('legend').classList.remove('hide');
+      document.getElementById('embed-mode').disabled = false;
+      document.getElementById('embed-reset').disabled = false;
+      fitEmbed();
+    } else {
+      setupScroll();
+      setState('hero', null); // guarantee initial map state
+    }
 
     // popup
     const fmt = (v,u) => v==null ? '—' : `${v.toLocaleString('en-US')}${u||''}`;
@@ -221,7 +251,10 @@ Promise.all([
     });
     map.on('mouseenter', 'dams', () => map.getCanvas().style.cursor = 'pointer');
     map.on('mouseleave', 'dams', () => map.getCanvas().style.cursor = '');
-  });
+  };
+  // Data can arrive after the map's load event, especially inside a lazy iframe.
+  if (map.loaded()) initializeMap();
+  else map.once('load', initializeMap);
 }).catch(err => { console.error('Load failed', err); document.getElementById('count').textContent = '—'; });
 
 /* ---------------- scrollama ---------------- */

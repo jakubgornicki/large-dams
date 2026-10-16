@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 <title>Past the Expiration Date — Europe's ageing dams</title>
 <meta name="description" content="An interactive map of Europe's ageing large dams and how four countries handle continued operation without an automatic new environmental assessment." />
+<script>if (new URLSearchParams(location.search).get('embed') === '1') document.documentElement.classList.add('embed');</script>
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/scrollama"></script>
@@ -120,6 +121,21 @@
   .credit{position:fixed;right:8px;bottom:4px;z-index:5;font-size:9.5px;color:var(--muted);opacity:.75}
   .credit a{color:var(--muted)}
 
+  /* The embed fills its iframe and keeps the narrative out of the map's way. */
+  .embed-controls{display:none}
+  html.embed,html.embed body{height:100%;overflow:hidden}
+  .embed #map{height:100%}
+  .embed .scrolly,.embed .panel,.embed .credit{display:none}
+  .embed .topbar{padding:8px;gap:8px}
+  .embed .brandmark{display:none}
+  .embed .langtoggle{margin-left:auto}
+  .embed .embed-controls{display:flex;position:fixed;top:58px;left:8px;right:8px;z-index:6;gap:6px;flex-wrap:wrap;pointer-events:none}
+  .embed-controls select,.embed-controls button,.embed-controls a{pointer-events:auto;font:12px var(--sans);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px;text-decoration:none;max-width:100%}
+  .embed-controls button{cursor:pointer}
+  .embed .legend{left:8px;bottom:30px;max-width:180px;font-size:11px;padding:8px 10px}
+  .embed .maplibregl-ctrl-top-right{top:106px}
+  .embed .maplibregl-ctrl-attrib{max-width:calc(100vw - 16px)}
+
   @media (max-width:640px){
     .step{padding:6vh 0;align-items:flex-end}
     .step .card,.step.right .card{margin:0 12px 12vh;max-width:none;padding:20px 20px}
@@ -142,6 +158,16 @@
 </div>
 
 <div class="legend hide" id="legend"><h4 id="legend-title"></h4><div id="legend-items"></div></div>
+
+<div class="embed-controls">
+  <select id="embed-mode" aria-label="Map colours" disabled>
+    <option value="age" data-i18n="embed_age"></option>
+    <option value="decade" data-i18n="embed_alert"></option>
+    <option value="threshold" data-i18n="embed_capacity"></option>
+  </select>
+  <button id="embed-reset" type="button" data-i18n="embed_reset" disabled></button>
+  <a id="embed-story" href="./" target="_blank" rel="noopener" data-i18n="embed_story"></a>
+</div>
 
 <div class="scrolly" id="scrolly">
 

@@ -3,6 +3,12 @@
    {n} placeholders are filled from stats.json at render time. */
 window.COPY = {
   en: {
+    embed_age: "Age (years)",
+    embed_alert: "50-year alert age",
+    embed_capacity: "Reservoir capacity",
+    embed_colours: "Map colours",
+    embed_reset: "Reset view",
+    embed_story: "Full story ↗",
     brand: "Past the Expiration Date",
     hero_headline: "European dams with a recorded construction year and a reservoir capacity of at least 10 million m³ are now past the 50-year alert age.",
     hero_alert_context: "The UN identifies 50 years as an alert age for large dams, associated with three interconnected challenges: increased failure risks, growing maintenance needs and declining functionality due to sedimentation.",
@@ -51,6 +57,12 @@ window.COPY = {
   },
 
   pl: {
+    embed_age: "Wiek (lata)",
+    embed_alert: "Próg 50 lat",
+    embed_capacity: "Pojemność zbiornika",
+    embed_colours: "Kolory mapy",
+    embed_reset: "Resetuj widok",
+    embed_story: "Cała historia ↗",
     brand: "Zapory po terminie",
     hero_headline: "europejskie zapory, dla których dostępne są dane o roku budowy, a pojemność zbiornika wynosi co najmniej 10 mln m³, ma już ponad 50 lat.",
     hero_alert_context: "ONZ uznaje 50 lat za próg alarmowy dla wielkich zapór. Po jego przekroczeniu rośnie ryzyko awarii, zwiększają się potrzeby i koszty remontów, a funkcjonalność obiektów spada z powodu zamulania zbiorników.",

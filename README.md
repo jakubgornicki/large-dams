@@ -24,6 +24,32 @@ Open [http://localhost:8848/](http://localhost:8848/). Do not open `web/index.ht
 
 On macOS, `preview.command` provides the same local preview and opens it in Google Chrome.
 
+## Embed the interactive map
+
+After deploying the embed changes, paste this HTML into your website's HTML block:
+
+```html
+<iframe
+  src="https://jakubgornicki.github.io/large-dams/?embed=1&amp;lang=en"
+  title="Interactive map of Europe's ageing dams"
+  width="100%"
+  height="600"
+  style="display:block; width:100%; height:600px; border:0;"
+  loading="lazy"
+></iframe>
+```
+
+Use `lang=pl` for Polish. You can adjust the height; at least 400 pixels is
+recommended to leave room for controls and the legend. If you host a fork,
+replace the URL with your own site's address.
+
+The `embed=1` view shows the map without the scrolling story. Visitors can pan,
+zoom with the buttons or pinch gestures, inspect dams, switch colour views and
+languages, reset the view, and open the full story in a new tab. Mouse-wheel
+zoom is disabled so visitors can keep scrolling the containing article.
+Map and data attribution remain visible. Omit `embed=1` to embed the complete
+scrolling story instead.
+
 ## Project structure
 
 ```text
