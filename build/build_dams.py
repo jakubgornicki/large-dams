@@ -132,6 +132,7 @@ def main():
         json.dump(feats, f, ensure_ascii=False, separators=(',', ':'))
     with open(os.path.join(OUT_DIR, "stats.json"), "w", encoding='utf-8') as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
+        f.write("\n")
 
     print(f"dams.json  : {len(feats)} dams  ({len(dated)} dated, {len(over)} over-10Mm3)")
     print(f"past alert : {stats['past_alert_over10']} over-10 dated dams >= 50 yrs "

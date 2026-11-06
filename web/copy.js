@@ -1,6 +1,4 @@
-/* Bilingual copy for "Past the Expiration Date".
-   EN and PL incorporate ClientEarth's July 2026 editorial review.
-   {n} placeholders are filled from stats.json at render time. */
+/* English and Polish text for the map and story. */
 window.COPY = {
   en: {
     embed_age: "Age (years)",
@@ -111,7 +109,7 @@ window.COPY = {
   },
 };
 
-/* Payload stat tiles — built from stats.json (values) + these labels. */
+/* Editorial figures shown in the impact section. */
 window.TILES = {
   en: [
     { v: "~1.2 million", red: false, l: "barriers now block Europe's rivers." },

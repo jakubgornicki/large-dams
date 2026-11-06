@@ -1,3 +1,26 @@
+/*!
+MIT License
+
+Copyright (c) 2026 Past the Expiration Date contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 /* Past the Expiration Date — scrollytelling app
    Fixed MapLibre map behind scroll steps; each step sets a map state.
    Bilingual (EN/PL) via window.COPY. Decade chart is inline SVG. */
@@ -9,7 +32,7 @@ const BRIEF_URL = 'https://www.clientearth.org/latest/documents/past-the-expirat
 
 let lang = (new URLSearchParams(location.search).get('lang') === 'pl') ? 'pl' : 'en';
 const isEmbed = new URLSearchParams(location.search).get('embed') === '1';
-let stats = null, damFeatures = null, countedOnce = false;
+let stats = null, countedOnce = false;
 
 /* ---------------- i18n ---------------- */
 function t(key) { return (window.COPY[lang] && window.COPY[lang][key]) || window.COPY.en[key] || ''; }
@@ -189,7 +212,6 @@ Promise.all([
   fetch('data/stats.json').then(r => r.json()),
 ]).then(([dams, s]) => {
   stats = s;
-  damFeatures = dams;
   document.getElementById('alert-num').textContent = s.past_alert_over10.toLocaleString();
 
   const fc = { type: 'FeatureCollection', features: dams.map(d => ({

@@ -1,37 +1,27 @@
-# Past the Expiration Date — interactive map
+# Past the Expiration Date
 
-A bilingual, public-facing scrollytelling map about ageing large dams in Europe. The site is static: MapLibre GL renders the map, Scrollama drives the narrative, and all published data is stored as JSON in the repository.
+An interactive companion to ClientEarth’s report on ageing dams in Europe. Readers can explore 4,321 mapped dams, see which have reached the 50-year alert age and follow the findings for Poland, Italy, Bulgaria and Romania. The story, map controls and methodology are available in English and Polish. Ages are measured against the report year, 2026.
 
-## Features
+[Explore the map in English](https://jakubgornicki.github.io/large-dams/?lang=en) · [Otwórz mapę po polsku](https://jakubgornicki.github.io/large-dams/?lang=pl) · [Read the ClientEarth report](https://www.clientearth.org/latest/documents/past-the-expiration-date-how-europe-extends-the-life-of-ageing-dams-without-environmental-assessments/)
 
-- English and Polish content with deep links through `?lang=en` and `?lang=pl`
-- interactive MapLibre map with age, decade and capacity views
-- animated headline counter and decade chart
-- country stories for Poland, Italy, Bulgaria and Romania
-- responsive layouts for desktop and mobile
-- standalone methodology and sources page
-- GitHub Pages deployment workflow
+## Download and publish
 
-## Run locally
+1. [Download the repository as a ZIP](https://github.com/jakubgornicki/large-dams/archive/refs/heads/main.zip) and extract it. The `web/` folder contains the complete site, including the published dam records.
+2. Copy the **contents of `web/`** to a directory on your HTTPS host, keeping `data/` beside `index.html`. For example, if you upload to `/maps/ageing-dams/`, the map opens at that path. You can also point a static host’s publish directory at `web` and leave its build command empty.
+3. Open the published directory with `?lang=en` and `?lang=pl`. In each version, check that the headline reaches **884**, the map shows dam locations and the final panel opens the report and methodology. For the map alone, open `?embed=1&lang=en`.
 
-Python 3 is the only local requirement. From the repository root:
+The server only needs to serve static files. Visitors’ browsers fetch MapLibre GL JS and Scrollama from UNPKG, and the dark basemap, tiles and labels from CARTO. Allow these resources under the host’s content security policy. Dam records and both language versions are served from your own site.
 
-```sh
-python3 -m http.server 8848 --directory web
-```
+**GitHub Pages.** To publish from your organisation’s account, fork the repository and enable GitHub Actions in the fork. In **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. In **Actions → Deploy to GitHub Pages**, choose **Run workflow** on `main`. The deployment job gives you the site address. Later pushes to `main` publish updates automatically. [GitHub Pages configuration](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 
-Open [http://localhost:8848/](http://localhost:8848/). Do not open `web/index.html` through a `file://` URL because browsers block the JSON requests used by the map.
+## Embed in a ClientEarth article
 
-On macOS, `preview.command` provides the same local preview and opens it in Google Chrome.
-
-## Embed the interactive map
-
-After deploying the embed changes, paste this HTML into your website's HTML block:
+After publishing the files, paste this iframe into the article’s HTML block. Replace the example address with the **published map directory**, including its trailing slash. If the article and map use different domains, the article must allow the map in an iframe and the map host must allow framing by the article’s domain.
 
 ```html
 <iframe
-  src="https://jakubgornicki.github.io/large-dams/?embed=1&amp;lang=en"
-  title="Interactive map of Europe's ageing dams"
+  src="https://example.org/maps/ageing-dams/?embed=1&amp;lang=en"
+  title="Interactive map of ageing dams in Europe"
   width="100%"
   height="600"
   style="display:block; width:100%; height:600px; border:0;"
@@ -39,58 +29,28 @@ After deploying the embed changes, paste this HTML into your website's HTML bloc
 ></iframe>
 ```
 
-Use `lang=pl` for Polish. You can adjust the height; at least 400 pixels is
-recommended to leave room for controls and the legend. If you host a fork,
-replace the URL with your own site's address.
+For a Polish article, set `lang=pl` and use the title “Interaktywna mapa starzejących się zapór w Europie”. The map-only view includes zoom controls, dam details and a link to the full story on your host. Mouse-wheel scrolling stays with the article. To embed the full scrolling story, omit `embed=1`.
 
-The `embed=1` view shows the map without the scrolling story. Visitors can pan,
-zoom with the buttons or pinch gestures, inspect dams, switch colour views and
-languages, reset the view, and open the full story in a new tab. Mouse-wheel
-zoom is disabled so visitors can keep scrolling the containing article.
-Map and data attribution remain visible. Omit `embed=1` to embed the complete
-scrolling story instead.
+## Preview and maintain
 
-## Project structure
-
-```text
-.github/workflows/pages.yml  GitHub Pages deployment
-build/build_dams.py          optional data rebuild script
-web/index.html               main scrollytelling page and styles
-web/app.js                   map, interaction and rendering logic
-web/copy.js                  English and Polish editorial content
-web/methodology.html         public methodology and sources
-web/data/dams.json           published map records
-web/data/stats.json          published aggregate statistics
-```
-
-The generated JSON files are committed, so contributors do not need the original source dataset to run or edit the site.
-
-## Rebuild the map data
-
-1. Download Global Dam Watch v1.0 from [Figshare](https://figshare.com/articles/dataset/Global_Dam_Watch_database_version_1_0/25988293).
-2. Place the extracted barrier table at `build/GDW_barriers_v1_0.txt`.
-3. Run:
+From the extracted repository directory, run the following command and open [the local preview](http://localhost:8848/). On Windows with the Python launcher, replace `python3` with `py -3`. Stop the server with Ctrl+C.
 
 ```sh
-python3 build/build_dams.py
+python3 -m http.server 8848 --bind 127.0.0.1 --directory web
 ```
 
-The script regenerates `web/data/dams.json` and `web/data/stats.json`. The downloaded source file is intentionally ignored by Git.
+| To change | Edit |
+| --- | --- |
+| English and Polish text, country cards or impact figures | `web/copy.js` |
+| Report URL, basemap or map interactions | `web/app.js` |
+| Story layout, styles or library versions | `web/index.html` |
+| Sources and methodology in either language | `web/methodology.html` |
+| Dam records and calculated totals | Follow the [data rebuild and validation instructions](CONTRIBUTING.md) |
 
-## Customize a fork
+## Credits and reuse
 
-- Edit editorial content in `web/copy.js`.
-- Update the briefing link in `BRIEF_URL` at the top of `web/app.js`.
-- Adjust colors and layout tokens in `web/index.html`.
-- Replace the published JSON files or rebuild them from Global Dam Watch.
-- Enable GitHub Pages with GitHub Actions as the deployment source.
+The original map software is distributed under the [MIT licence](LICENSE). The report, editorial text and ClientEarth marks retain their respective rights.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the validation checklist.
+The dam locations and aggregate counts are adapted from Lehner et al. (2024), *Global Dam Watch database version 1.0*. The map selects European records, rounds coordinates and derives ages and summary statistics. Retain the data credit and licence link when republishing. [Source dataset](https://doi.org/10.6084/m9.figshare.25988293.v1) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
-## Data and attribution
-
-The map uses Global Dam Watch v1.0 and a CARTO basemap with OpenStreetMap data. Additional figures are attributed on the methodology page. Source datasets and map providers retain their own terms; this repository does not relicense third-party data.
-
-## License
-
-The original software in this repository is available under the [MIT License](LICENSE). Third-party datasets, basemap content, editorial material and trademarks are excluded from that grant and remain subject to their respective source terms.
+The basemap uses CARTO and OpenStreetMap contributors’ data. Keep the map credits visible in standalone and embedded views. Publishers reusing the project should check that their use is covered by CARTO’s terms. [CARTO basemap terms](https://docs.carto.com/faqs/carto-basemaps) · [OpenStreetMap attribution](https://www.openstreetmap.org/copyright)
