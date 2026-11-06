@@ -5,7 +5,7 @@
 const AGE = { lt25:'#35b0c9', b25:'#3d7fe0', b50:'#f0842e', b75:'#e5352b', unknown:'#6b7280' };
 const PAST = '#d03b3b', NOTYET = '#2f7fd6';
 const REF_YEAR = 2026, ALERT = 50;
-const BRIEF_URL = '#'; // Set this to the public briefing URL when customizing a fork.
+const BRIEF_URL = 'https://www.clientearth.org/latest/documents/past-the-expiration-date-how-europe-extends-the-life-of-ageing-dams-without-environmental-assessments/';
 
 let lang = (new URLSearchParams(location.search).get('lang') === 'pl') ? 'pl' : 'en';
 const isEmbed = new URLSearchParams(location.search).get('embed') === '1';
