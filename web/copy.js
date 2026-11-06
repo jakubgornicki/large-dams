@@ -17,7 +17,7 @@ window.COPY = {
 
     s2_eyebrow: "How we got here",
     s2_title: "Europe built its dams in one great wave.",
-    s2_body: "Most of Europe's large dams were built between the 1950s and the 1970s. Colour the map by decade of construction and the pattern is unmistakable: most of the continent's large dams date from the same period. This construction boom is now more than half a century behind us. Yet large dams continue to operate as if nothing has changed.",
+    s2_body: "Most of Europe's large dams were built between the 1950s and the 1970s. Colour the map by decade of construction and the pattern is unmistakable: most of the continent's large dams date from the same period. This construction boom is now more than half a century behind us. Yet many large dams continue to operate as if nothing has changed.",
     chart_past: "Past the 50-yr alert age",
     chart_notyet: "Not yet",
     s2_cap: "Large European dams by decade of construction. Based on the {dated} dams with a documented year of construction in the Global Dam Watch database.",
@@ -114,17 +114,17 @@ window.COPY = {
 /* Payload stat tiles — built from stats.json (values) + these labels. */
 window.TILES = {
   en: [
-    { v: "1.2 million", red: false, l: "barriers now block Europe's rivers." },
+    { v: "~1.2 million", red: false, l: "barriers now block Europe's rivers." },
     { v: "0.7", red: false, l: "barriers per kilometre of river, on average." },
-    { v: "~93%", red: true, l: "decline in populations of migratory fish, such as salmon and eel, since 1970." },
+    { v: "~75%", red: true, l: "decline in populations of migratory fish, such as salmon and eel, since 1970." },
     { v: "~1bn m³", red: false, l: "of sediment trapped each year in EU reservoirs — a volume equivalent to roughly 385 Great Pyramids of Giza." },
     { v: "0.8 Gt", red: false, l: "CO₂-equivalent emissions from reservoir surfaces each year, comparable to emissions from Europe's transport sector." },
     { v: "13–19%", red: true, l: "of global reservoir storage capacity has already been lost to sediment accumulation; a further 10% could be lost by 2050." },
   ],
   pl: [
-    { v: "1,2 mln", red: false, l: "barier przegradza dziś europejskie rzeki." },
+    { v: "~1,2 mln", red: false, l: "barier przegradza dziś europejskie rzeki." },
     { v: "0,7", red: false, l: "bariery na każdy kilometr rzeki (średnio)." },
-    { v: "~93%", red: true, l: "spadek liczebności populacji ryb wędrownych, takich jak łosoś i węgorz, od 1970 r." },
+    { v: "~75%", red: true, l: "spadek liczebności populacji ryb wędrownych, takich jak łosoś i węgorz, od 1970 r." },
     { v: "~1 mld m³", red: false, l: "osadów dennych zatrzymywanych rocznie w zbiornikach zaporowych w UE - objętość odpowiadająca ok. 385 Wielkim Piramidom w Gizie." },
     { v: "0,8 Gt", red: false, l: "emisji ekwiwalentu CO₂ z powierzchni zbiorników rocznie - wartość porównywalna z emisjami europejskiego sektora transportu." },
     { v: "13–19%", red: true, l: "globalnej pojemności zbiorników już utracono wskutek gromadzenia się osadów; do 2050 r. spodziewana jest utrata kolejnych 10%." },
